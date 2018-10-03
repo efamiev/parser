@@ -5,7 +5,10 @@ const moment = require('moment');
 
 const sendMail = require('./send_email');
 
-const avitoRequest = () => request('https://www.avito.ru/krasnoyarskiy_kray/dlya_biznesa?s=104&s_trg=3&q=%D0%BA%D0%BE%D0%BD%D1%82%D0%B5%D0%B9%D0%BD%D0%B5%D1%80',
+const avitoRequest = () => request({
+    url: 'https://www.avito.ru/krasnoyarskiy_kray/dlya_biznesa?s=104&s_trg=3&q=%D0%BA%D0%BE%D0%BD%D1%82%D0%B5%D0%B9%D0%BD%D0%B5%D1%80',
+    proxy: 'http://uciedh:G5SG68Ep1Z@109.248.51.32:24531'
+  },
   (error, response, html) => {
   
   if(error) throw error;
@@ -44,11 +47,11 @@ const avitoRequest = () => request('https://www.avito.ru/krasnoyarskiy_kray/dlya
     const currentDay = new Date().getDay();
 
     //  Item time constant
-    const hours = item.postTime.slice(toString(item.postTime).indexOf(' '), item.postTime.indexOf(':'));
+    const hours = item.postTime.slice(toString(item.postTime).indexOf(' '), item.postTime.indexOf(':')); // -7 on server TODO: convert all date to ISO
     const minutes = item.postTime.slice(item.postTime.indexOf(':') + 1);
-    const diffirenceInTime = Math.abs(moment(new Date(currentYear, currentMonth, currentDay, hours, minutes)).diff(moment(), 'minutes'));
+    const diffirenceInTime = Math.abs(moment(new Date(currentYear, currentMonth, currentDay, Number(hours) + 4, minutes)).diff(moment().format(), 'minutes'));
 
-    console.log(diffirenceInTime, item.title.toLowerCase().indexOf('контейнер') >= 0)
+    console.log('Diffirent in time: ' + diffirenceInTime);
     if (diffirenceInTime <= 5 && item.title.toLowerCase().indexOf('контейнер') >= 0) {
       return item;
     } else {

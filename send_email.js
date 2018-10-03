@@ -24,7 +24,7 @@ const sendMail = (data) => {
     transporter.sendMail(
     {
         from: 'fiald@mail.ru',
-        to: 'famiev91@gmail.com',
+        to: 'advertmail24@gmail.com, famiev91@gmail.com',
         subject: 'Объявления Avito',
         html
     },
