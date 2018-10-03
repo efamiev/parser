@@ -46,17 +46,18 @@ const avitoRequest = () => request('https://www.avito.ru/krasnoyarskiy_kray/dlya
     //  Item time constant
     const hours = item.postTime.slice(toString(item.postTime).indexOf(' '), item.postTime.indexOf(':'));
     const minutes = item.postTime.slice(item.postTime.indexOf(':') + 1);
-    const diffirenceInTime = Math.abs(moment(new Date(currentYear, currentMonth, currentDay, hours - 7, minutes)).diff(moment(), 'minutes'));
+    const diffirenceInTime = Math.abs(moment(new Date(currentYear, currentMonth, currentDay, hours, minutes)).diff(moment(), 'minutes'));
 
-    if(diffirenceInTime <= 800) {
+    console.log(diffirenceInTime, item.title.toLowerCase().indexOf('контейнер') >= 0)
+    if (diffirenceInTime <= 5 && item.title.toLowerCase().indexOf('контейнер') >= 0) {
       return item;
     } else {
-      return;
+      return false;
     }
 
   });
 
-  sendItems.length !== 0 && sendMail(sendItems);
+  sendItems.length > 0 && sendMail(sendItems);
 
   console.log('Все данные: ', newItemIndices);
   console.log('Отправляемые данные: ', sendItems);
@@ -65,5 +66,5 @@ const avitoRequest = () => request('https://www.avito.ru/krasnoyarskiy_kray/dlya
 
 avitoRequest();
 
-// 30 min
-setInterval(avitoRequest, 1800000);
+// 5 min
+setInterval(avitoRequest, 300000);
