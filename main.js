@@ -27,7 +27,7 @@ const avitoRequest = () => request({
 
     if(isNaN(Number(item)) && item.slice(0, toString(item).indexOf(' ')) === 'Сегодня') {
 
-      const hours = item.slice(toString(item).indexOf(' '), item.indexOf(':')); // -7 on server TODO: convert all date to ISO
+      const hours = item.slice(toString(item).indexOf(' '), item.indexOf(':'));
       const minutes = item.slice(item.indexOf(':') + 1);
 
       acc.push({

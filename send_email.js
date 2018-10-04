@@ -25,6 +25,7 @@ const sendMail = (data) => {
     {
         from: 'fiald@mail.ru',
         to: 'advertmail24@gmail.com, famiev91@gmail.com',
+        // to: 'famiev91@gmail.com',
         subject: 'Объявления Avito',
         html
     },
