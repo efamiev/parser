@@ -26,8 +26,12 @@ const avitoRequest = () => request({
   const newItemIndices = time.reduce((acc, item, index) => {
 
     if(isNaN(Number(item)) && item.slice(0, toString(item).indexOf(' ')) === 'Сегодня') {
+
+      const hours = item.slice(toString(item).indexOf(' '), item.indexOf(':')); // -7 on server TODO: convert all date to ISO
+      const minutes = item.slice(item.indexOf(':') + 1);
+
       acc.push({
-        postTime: item,
+        postTime: `Сегодня ${Number(hours) + 4}:${minutes}`,
         title: titleItems[index],
         price: price[index],
         link: linksItems[index]
@@ -49,7 +53,7 @@ const avitoRequest = () => request({
     //  Item time constant
     const hours = item.postTime.slice(toString(item.postTime).indexOf(' '), item.postTime.indexOf(':')); // -7 on server TODO: convert all date to ISO
     const minutes = item.postTime.slice(item.postTime.indexOf(':') + 1);
-    const diffirenceInTime = Math.abs(moment(new Date(currentYear, currentMonth, currentDay, Number(hours) + 4, minutes)).diff(moment().format(), 'minutes'));
+    const diffirenceInTime = Math.abs(moment(new Date(currentYear, currentMonth, currentDay, hours, minutes)).diff(moment().format(), 'minutes'));
 
     console.log('Diffirent in time: ' + diffirenceInTime);
     if (diffirenceInTime <= 5 && item.title.toLowerCase().indexOf('контейнер') >= 0) {
