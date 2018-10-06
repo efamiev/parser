@@ -11,7 +11,11 @@ const avitoRequest = () => request({
   },
   (error, response, html) => {
   
-  if(error) throw error;
+  if(error) {
+    sendMail({ isError: true });
+    
+    return;
+  }
 
   const $ = cheerio.load(html);
   const titleContainer = $('.item.item_table .item-description-title-link');
@@ -56,6 +60,7 @@ const avitoRequest = () => request({
     const diffirenceInTime = Math.abs(moment(new Date(currentYear, currentMonth, currentDay, hours, minutes)).diff(moment().format(), 'minutes'));
 
     console.log('Diffirent in time: ' + diffirenceInTime);
+    
     if (diffirenceInTime <= 5 && item.title.toLowerCase().indexOf('контейнер') >= 0) {
       return item;
     } else {
@@ -64,7 +69,7 @@ const avitoRequest = () => request({
 
   });
 
-  sendItems.length > 0 && sendMail(sendItems);
+  sendItems.length > 0 && sendMail({ items: sendItems });
 
   console.log('Все данные: ', newItemIndices);
   console.log('Отправляемые данные: ', sendItems);
