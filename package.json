@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "babel-node ./src/main.js",
+    "start": "babel src -d dist --presets env && node ./dist/main.js"
   },
   "keywords": [],
   "author": "",
@@ -14,5 +15,16 @@
     "moment": "^2.22.2",
     "nodemailer": "^4.6.8",
     "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/node": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^5.6.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0"
   }
 }
