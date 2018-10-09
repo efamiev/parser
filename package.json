@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch": "babel-node ./src/main.js",
-    "start": "babel src -d dist --presets env && node ./dist/main.js"
+    "build": "babel src -d dist --presets env",
+    "start": "node ./dist/main.js",
+    "watch": "babel-node ./src/main.js"
   },
   "keywords": [],
   "author": "",
