@@ -1,6 +1,7 @@
 import cheerio from 'cheerio';
 import moment from 'moment';
 
+import Advert from '../models/Advert';
 import sendMail from '../sendEmail';
 
 export default (error, response, html) => {
@@ -42,7 +43,7 @@ export default (error, response, html) => {
   const sendItems = items.filter((item) => {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
-    const currentDay = new Date().getDate();
+    const currentDay = item.hours === 24 ? new Date().getDate() - 1 : new Date().getDate();
 
     const diffirenceInTime = Math.abs(
       moment(new Date(currentYear, currentMonth, currentDay, item.hours, item.minutes)).diff(
@@ -59,8 +60,24 @@ export default (error, response, html) => {
     return false;
   });
 
-  sendItems.length > 0 && sendMail({ items: sendItems });
+  Advert.find({}).exec((err, docs) => {
+    if (err) {
+      console.log(err);
+    } else {
+      const res = docs.reduce((acc, { link }) => Object.assign(acc, { [link]: 2 }), {});
+      const res1 = sendItems.reduce((acc, item) => {
+        if (res[item.link]) {
+          Advert.findOneAndDelete({ link: item.link }).then(() => console.log('Deleting'));
+        } else {
+          Advert.create({ link: item.link }).then(() => console.log('Creating'));
+          return acc.concat(item);
+        }
 
-  console.log('Все данные: ', items);
-  console.log('Отправляемые данные: ', sendItems);
+        return acc;
+      }, []);
+      res1.length > 0 && sendMail({ items: sendItems });
+      console.log('Все данные: ', sendItems);
+      console.log('Отправляемые данные: ', res1);
+    }
+  });
 };

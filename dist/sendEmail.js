@@ -49,7 +49,7 @@ var successSendMail = function successSendMail(data) {
   transporter.sendMail({
     from: _constants.sendersMail,
     to: _constants.recipientsMail,
-    // to: "famiev91@gmail.com",
+    // to: 'famiev91@gmail.com',
     subject: 'Объявления Avito',
     html: html
   }, function (error, info) {

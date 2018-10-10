@@ -45,7 +45,7 @@ const successSendMail = (data) => {
     {
       from: sendersMail,
       to: recipientsMail,
-      // to: "famiev91@gmail.com",
+      // to: 'famiev91@gmail.com',
       subject: 'Объявления Avito',
       html
     },

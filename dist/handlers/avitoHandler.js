@@ -12,11 +12,17 @@ var _moment = require('moment');
 
 var _moment2 = _interopRequireDefault(_moment);
 
+var _Advert = require('../models/Advert');
+
+var _Advert2 = _interopRequireDefault(_Advert);
+
 var _sendEmail = require('../sendEmail');
 
 var _sendEmail2 = _interopRequireDefault(_sendEmail);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 exports.default = function (error, response, html) {
   if (error) {
@@ -67,7 +73,7 @@ exports.default = function (error, response, html) {
   var sendItems = items.filter(function (item) {
     var currentYear = new Date().getFullYear();
     var currentMonth = new Date().getMonth();
-    var currentDay = new Date().getDate();
+    var currentDay = item.hours === 24 ? new Date().getDate() - 1 : new Date().getDate();
 
     var diffirenceInTime = Math.abs((0, _moment2.default)(new Date(currentYear, currentMonth, currentDay, item.hours, item.minutes)).diff((0, _moment2.default)().format(), 'minutes'));
 
@@ -79,8 +85,31 @@ exports.default = function (error, response, html) {
     return false;
   });
 
-  sendItems.length > 0 && (0, _sendEmail2.default)({ items: sendItems });
+  _Advert2.default.find({}).exec(function (err, docs) {
+    if (err) {
+      console.log(err);
+    } else {
+      var res = docs.reduce(function (acc, _ref) {
+        var link = _ref.link;
+        return Object.assign(acc, _defineProperty({}, link, 2));
+      }, {});
+      var res1 = sendItems.reduce(function (acc, item) {
+        if (res[item.link]) {
+          _Advert2.default.findOneAndDelete({ link: item.link }).then(function () {
+            return console.log('Deleting');
+          });
+        } else {
+          _Advert2.default.create({ link: item.link }).then(function () {
+            return console.log('Creating');
+          });
+          return acc.concat(item);
+        }
 
-  console.log('Все данные: ', items);
-  console.log('Отправляемые данные: ', sendItems);
+        return acc;
+      }, []);
+      res1.length > 0 && (0, _sendEmail2.default)({ items: sendItems });
+      console.log('Все данные: ', sendItems);
+      console.log('Отправляемые данные: ', res1);
+    }
+  });
 };
