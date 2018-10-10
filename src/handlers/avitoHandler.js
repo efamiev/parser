@@ -1,8 +1,8 @@
 import cheerio from 'cheerio';
-import moment from 'moment';
 
 import Advert from '../models/Advert';
 import sendMail from '../sendEmail';
+import { formatToDate, diffirenceInTime } from '../helpers';
 
 export default (error, response, html) => {
   if (error) {
@@ -21,10 +21,11 @@ export default (error, response, html) => {
   const time = timeContainer.map((index, el) => el.attribs['data-absolute-date'].trim()).get();
   const relativeTime = timeContainer.map((index, el) => el.attribs['data-relative-date'].trim()).get();
 
-  const items = time.reduce((acc, item, index) => {
-    if (isNaN(Number(item)) && item.slice(0, toString(item).indexOf(' ')) === 'Сегодня') {
-      const hours = Number(item.slice(toString(item).indexOf(' '), item.indexOf(':'))) + 4;
-      const minutes = Number(item.slice(item.indexOf(':') + 1));
+  const adverts = time.reduce((acc, item, index) => {
+    if (isNaN(Number(item)) && item.indexOf('Сегодня') !== -1) {
+      const date = formatToDate(item);
+      const hours = date.hour();
+      const minutes = date.minute();
 
       acc.push({
         postTime: `Сегодня ${hours}:${minutes}`,
@@ -32,6 +33,7 @@ export default (error, response, html) => {
         price: price[index],
         link: linksItems[index],
         isMoreThanHour: relativeTime[index].indexOf('часов') !== -1,
+        datePostTime: date,
         hours,
         minutes
       });
@@ -40,21 +42,10 @@ export default (error, response, html) => {
     return acc;
   }, []);
 
-  const sendItems = items.filter((item) => {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth();
-    const currentDay = item.hours === 24 ? new Date().getDate() - 1 : new Date().getDate();
+  const filteredAds = adverts.filter((item) => {
+    console.log(`Diffirent in time: ${diffirenceInTime(item.datePostTime)}`);
 
-    const diffirenceInTime = Math.abs(
-      moment(new Date(currentYear, currentMonth, currentDay, item.hours, item.minutes)).diff(
-        moment().format(),
-        'minutes'
-      )
-    );
-
-    console.log(`Diffirent in time: ${diffirenceInTime}`);
-
-    if (diffirenceInTime <= 5 && item.title.toLowerCase().indexOf('контейнер') >= 0 && !item.isMoreThanHour) {
+    if (diffirenceInTime(item.datePostTime) <= 5 && item.title.toLowerCase().indexOf('контейнер') >= 0) {
       return item;
     }
     return false;
@@ -62,11 +53,11 @@ export default (error, response, html) => {
 
   Advert.find({}).exec((err, docs) => {
     if (err) {
-      console.log(err);
+      sendMail({ isError: true });
     } else {
-      const res = docs.reduce((acc, { link }) => Object.assign(acc, { [link]: 2 }), {});
-      const res1 = sendItems.reduce((acc, item) => {
-        if (res[item.link]) {
+      const dbData = docs.reduce((acc, { link }) => Object.assign(acc, { [link]: 2 }), {});
+      const seltData = filteredAds.reduce((acc, item) => {
+        if (dbData[item.link]) {
           Advert.findOneAndDelete({ link: item.link }).then(() => console.log('Deleting'));
         } else {
           Advert.create({ link: item.link }).then(() => console.log('Creating'));
@@ -75,9 +66,9 @@ export default (error, response, html) => {
 
         return acc;
       }, []);
-      res1.length > 0 && sendMail({ items: sendItems });
-      console.log('Все данные: ', sendItems);
-      console.log('Отправляемые данные: ', res1);
+
+      seltData.length > 0 && sendMail({ items: seltData });
+      console.log('Отправляемые данные: ', seltData);
     }
   });
 };

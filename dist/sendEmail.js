@@ -20,7 +20,7 @@ var transporter = _nodemailer2.default.createTransport({
   }
 });
 
-var errorSendMail = function errorSendMail() {
+function errorSendMail() {
   transporter.sendMail({
     from: _constants.sendersMail,
     to: 'famiev91@gmail.com',
@@ -33,9 +33,9 @@ var errorSendMail = function errorSendMail() {
       console.log('Email send ' + info.response);
     }
   });
-};
+}
 
-var successSendMail = function successSendMail(data) {
+function successSendMail(data) {
   var html = data.reduce(function (acc, item) {
     var link = '<tr><td><h1 style="font-size: 21px;"><a style="text-decoration: none;" href=https://www.avito.ru' + item.link + '>' + item.title + '</a></h1></td></tr>';
     var postTime = '<tr><td><b>' + item.postTime + '</b></td></tr>';
@@ -49,7 +49,6 @@ var successSendMail = function successSendMail(data) {
   transporter.sendMail({
     from: _constants.sendersMail,
     to: _constants.recipientsMail,
-    // to: 'famiev91@gmail.com',
     subject: 'Объявления Avito',
     html: html
   }, function (error, info) {
@@ -59,7 +58,7 @@ var successSendMail = function successSendMail(data) {
       console.log('Email send ' + info.response);
     }
   });
-};
+}
 
 exports.default = function (data) {
   return data.isError ? errorSendMail() : successSendMail(data.items);

@@ -8,10 +8,6 @@ var _cheerio = require('cheerio');
 
 var _cheerio2 = _interopRequireDefault(_cheerio);
 
-var _moment = require('moment');
-
-var _moment2 = _interopRequireDefault(_moment);
-
 var _Advert = require('../models/Advert');
 
 var _Advert2 = _interopRequireDefault(_Advert);
@@ -19,6 +15,8 @@ var _Advert2 = _interopRequireDefault(_Advert);
 var _sendEmail = require('../sendEmail');
 
 var _sendEmail2 = _interopRequireDefault(_sendEmail);
+
+var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -51,10 +49,11 @@ exports.default = function (error, response, html) {
     return el.attribs['data-relative-date'].trim();
   }).get();
 
-  var items = time.reduce(function (acc, item, index) {
-    if (isNaN(Number(item)) && item.slice(0, toString(item).indexOf(' ')) === 'Сегодня') {
-      var hours = Number(item.slice(toString(item).indexOf(' '), item.indexOf(':'))) + 4;
-      var minutes = Number(item.slice(item.indexOf(':') + 1));
+  var adverts = time.reduce(function (acc, item, index) {
+    if (isNaN(Number(item)) && item.indexOf('Сегодня') !== -1) {
+      var date = (0, _helpers.formatToDate)(item);
+      var hours = date.hour();
+      var minutes = date.minute();
 
       acc.push({
         postTime: '\u0421\u0435\u0433\u043E\u0434\u043D\u044F ' + hours + ':' + minutes,
@@ -62,6 +61,7 @@ exports.default = function (error, response, html) {
         price: price[index],
         link: linksItems[index],
         isMoreThanHour: relativeTime[index].indexOf('часов') !== -1,
+        datePostTime: date,
         hours: hours,
         minutes: minutes
       });
@@ -70,16 +70,10 @@ exports.default = function (error, response, html) {
     return acc;
   }, []);
 
-  var sendItems = items.filter(function (item) {
-    var currentYear = new Date().getFullYear();
-    var currentMonth = new Date().getMonth();
-    var currentDay = item.hours === 24 ? new Date().getDate() - 1 : new Date().getDate();
+  var filteredAds = adverts.filter(function (item) {
+    console.log('Diffirent in time: ' + (0, _helpers.diffirenceInTime)(item.datePostTime));
 
-    var diffirenceInTime = Math.abs((0, _moment2.default)(new Date(currentYear, currentMonth, currentDay, item.hours, item.minutes)).diff((0, _moment2.default)().format(), 'minutes'));
-
-    console.log('Diffirent in time: ' + diffirenceInTime);
-
-    if (diffirenceInTime <= 5 && item.title.toLowerCase().indexOf('контейнер') >= 0 && !item.isMoreThanHour) {
+    if ((0, _helpers.diffirenceInTime)(item.datePostTime) <= 5 && item.title.toLowerCase().indexOf('контейнер') >= 0) {
       return item;
     }
     return false;
@@ -87,14 +81,14 @@ exports.default = function (error, response, html) {
 
   _Advert2.default.find({}).exec(function (err, docs) {
     if (err) {
-      console.log(err);
+      (0, _sendEmail2.default)({ isError: true });
     } else {
-      var res = docs.reduce(function (acc, _ref) {
+      var dbData = docs.reduce(function (acc, _ref) {
         var link = _ref.link;
         return Object.assign(acc, _defineProperty({}, link, 2));
       }, {});
-      var res1 = sendItems.reduce(function (acc, item) {
-        if (res[item.link]) {
+      var seltData = filteredAds.reduce(function (acc, item) {
+        if (dbData[item.link]) {
           _Advert2.default.findOneAndDelete({ link: item.link }).then(function () {
             return console.log('Deleting');
           });
@@ -107,9 +101,9 @@ exports.default = function (error, response, html) {
 
         return acc;
       }, []);
-      res1.length > 0 && (0, _sendEmail2.default)({ items: sendItems });
-      console.log('Все данные: ', sendItems);
-      console.log('Отправляемые данные: ', res1);
+
+      seltData.length > 0 && (0, _sendEmail2.default)({ items: seltData });
+      console.log('Отправляемые данные: ', seltData);
     }
   });
 };

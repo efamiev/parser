@@ -10,7 +10,7 @@ const transporter = nodemail.createTransport({
   }
 });
 
-const errorSendMail = () => {
+function errorSendMail() {
   transporter.sendMail(
     {
       from: sendersMail,
@@ -26,9 +26,9 @@ const errorSendMail = () => {
       }
     }
   );
-};
+}
 
-const successSendMail = (data) => {
+function successSendMail(data) {
   let html = data.reduce((acc, item) => {
     const link = `<tr><td><h1 style="font-size: 21px;"><a style="text-decoration: none;" href=https://www.avito.ru${
       item.link
@@ -45,7 +45,6 @@ const successSendMail = (data) => {
     {
       from: sendersMail,
       to: recipientsMail,
-      // to: 'famiev91@gmail.com',
       subject: 'Объявления Avito',
       html
     },
@@ -57,6 +56,6 @@ const successSendMail = (data) => {
       }
     }
   );
-};
+}
 
 export default data => (data.isError ? errorSendMail() : successSendMail(data.items));
