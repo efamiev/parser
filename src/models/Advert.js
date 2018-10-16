@@ -1,4 +1,6 @@
-import mongoose, { Schema } from 'mongoose';
+const mongoose = require('mongoose');
+
+const { Schema } = mongoose;
 
 const AdvertSchema = new Schema({
   link: {
@@ -9,4 +11,4 @@ const AdvertSchema = new Schema({
 
 const Advert = mongoose.model('adverts', AdvertSchema);
 
-export default Advert;
+module.exports = Advert;

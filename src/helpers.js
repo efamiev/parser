@@ -1,6 +1,6 @@
-import moment from 'moment';
+const moment = require('moment');
 
-export function formatToDate(date) {
+function formatToDate(date) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
 
@@ -12,4 +12,9 @@ export function formatToDate(date) {
   return moment(new Date(currentYear, currentMonth, currentDay, hours, minutes)).add(4, 'h');
 }
 
-export const diffirenceInTime = date => Math.abs(date.diff(moment(), 'minutes'));
+const diffirenceInTime = date => Math.abs(date.diff(moment(), 'minutes'));
+
+module.exports = {
+  formatToDate,
+  diffirenceInTime
+};

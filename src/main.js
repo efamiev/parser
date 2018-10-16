@@ -1,11 +1,12 @@
-import request from 'request';
-import mongoose from 'mongoose';
+const request = require('request');
+const mongoose = require('mongoose');
 
-import avitoHandler from './handlers/avitoHandler';
-import {
+const avitoHandler = require('./handlers/avitoHandler');
+const {
   proxy, avitoUrl, fiveMinuteInterval, mongoURI
-} from './constants';
+} = require('./constants');
 
+console.log(proxy);
 mongoose
   .connect(
     mongoURI,

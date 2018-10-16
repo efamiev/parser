@@ -1,6 +1,6 @@
-import nodemail from 'nodemailer';
+const nodemail = require('nodemailer');
 
-import { sendersMail, sendersMailPassword, recipientsMail } from './constants';
+const { sendersMail, sendersMailPassword, recipientsMail } = require('./constants');
 
 const transporter = nodemail.createTransport({
   service: 'gmail',
@@ -58,4 +58,4 @@ function successSendMail(data) {
   );
 }
 
-export default data => (data.isError ? errorSendMail() : successSendMail(data.items));
+module.exports = data => (data.isError ? errorSendMail() : successSendMail(data.items));

@@ -1,10 +1,11 @@
-import cheerio from 'cheerio';
+const cheerio = require('cheerio');
 
-import Advert from '../models/Advert';
-import sendMail from '../sendEmail';
-import { formatToDate, diffirenceInTime } from '../helpers';
+const Advert = require('../models/Advert');
+const sendMail = require('../sendEmail');
 
-export default (error, response, html) => {
+const { formatToDate, diffirenceInTime } = require('../helpers');
+
+function avitoHandler(error, response, html) {
   if (error) {
     sendMail({ isError: true });
     return;
@@ -71,4 +72,6 @@ export default (error, response, html) => {
       console.log('Отправляемые данные: ', seltData);
     }
   });
-};
+}
+
+module.exports = avitoHandler;
