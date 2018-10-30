@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 const Advert = require('../models/Advert');
 const sendMail = require('../sendEmail');
 
-const { formatToDate, diffirenceInTime } = require('../helpers');
+const { formatToDate, diffirenceInTime, indexOf } = require('../helpers');
 
 function avitoHandler(error, response, html) {
   if (error) {
@@ -23,7 +23,7 @@ function avitoHandler(error, response, html) {
   const relativeTime = timeContainer.map((index, el) => el.attribs['data-relative-date'].trim()).get();
 
   const adverts = time.reduce((acc, item, index) => {
-    if (isNaN(Number(item)) && item.indexOf('Сегодня') !== -1) {
+    if (isNaN(Number(item)) && indexOf(item, 'Сегодня')) {
       const date = formatToDate(item);
       const hours = date.hour();
       const minutes = date.minute();
@@ -33,7 +33,7 @@ function avitoHandler(error, response, html) {
         title: titleItems[index],
         price: price[index],
         link: linksItems[index],
-        isMoreThanHour: relativeTime[index].indexOf('часов') !== -1,
+        isMoreThanHour: indexOf(relativeTime[index], 'часов'),
         datePostTime: date,
         hours,
         minutes
@@ -46,7 +46,9 @@ function avitoHandler(error, response, html) {
   const filteredAds = adverts.filter((item) => {
     console.log(`Diffirent in time: ${diffirenceInTime(item.datePostTime)}`);
 
-    if (diffirenceInTime(item.datePostTime) <= 5 && item.title.toLowerCase().indexOf('контейнер') >= 0) {
+    const condition = indexOf(item.title, 'контейнер') && !indexOf(item.title, 'рефконтейнер') && !indexOf(item.title, 'мусор');
+
+    if (diffirenceInTime(item.datePostTime) <= 5 && condition) {
       return item;
     }
     return false;

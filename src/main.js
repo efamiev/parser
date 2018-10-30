@@ -6,7 +6,6 @@ const {
   proxy, avitoUrl, fiveMinuteInterval, mongoURI
 } = require('./constants');
 
-console.log(proxy);
 mongoose
   .connect(
     mongoURI,

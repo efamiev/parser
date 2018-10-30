@@ -12,9 +12,12 @@ function formatToDate(date) {
   return moment(new Date(currentYear, currentMonth, currentDay, hours, minutes)).add(4, 'h');
 }
 
+const indexOf = (string, word) => string.toLowerCase().indexOf(word) !== -1 ? true : false;
+
 const diffirenceInTime = date => Math.abs(date.diff(moment(), 'minutes'));
 
 module.exports = {
+  indexOf,
   formatToDate,
   diffirenceInTime
 };
