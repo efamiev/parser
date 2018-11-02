@@ -20,10 +20,9 @@ function avitoHandler(error, response, html) {
   const linksItems = titleContainer.map((index, el) => el.attribs.href).get();
   const price = priceContainer.map((index, el) => el.attribs.content).get();
   const time = timeContainer.map((index, el) => el.attribs['data-absolute-date'].trim()).get();
-  const relativeTime = timeContainer.map((index, el) => el.attribs['data-relative-date'].trim()).get();
 
   const adverts = time.reduce((acc, item, index) => {
-    if (isNaN(Number(item)) && indexOf(item, 'Сегодня')) {
+    if (isNaN(Number(item)) && indexOf(item, 'сегодня')) {
       const date = formatToDate(item);
       const hours = date.hour();
       const minutes = date.minute();
@@ -33,7 +32,6 @@ function avitoHandler(error, response, html) {
         title: titleItems[index],
         price: price[index],
         link: linksItems[index],
-        isMoreThanHour: indexOf(relativeTime[index], 'часов'),
         datePostTime: date,
         hours,
         minutes
@@ -44,9 +42,9 @@ function avitoHandler(error, response, html) {
   }, []);
 
   const filteredAds = adverts.filter((item) => {
-    console.log(`Diffirent in time: ${diffirenceInTime(item.datePostTime)}`);
-
-    const condition = indexOf(item.title, 'контейнер') && !indexOf(item.title, 'рефконтейнер') && !indexOf(item.title, 'мусор');
+    const condition = indexOf(item.title, 'контейнер')
+      && !indexOf(item.title, 'рефконтейнер')
+      && !indexOf(item.title, 'мусор');
 
     if (diffirenceInTime(item.datePostTime) <= 5 && condition) {
       return item;
@@ -71,7 +69,6 @@ function avitoHandler(error, response, html) {
       }, []);
 
       seltData.length > 0 && sendMail({ items: seltData });
-      console.log('Отправляемые данные: ', seltData);
     }
   });
 }

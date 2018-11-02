@@ -1,5 +1,7 @@
 const proxy = 'http://uciedh:G5SG68Ep1Z@109.248.51.32:24531';
-const mongoURI = process.env.NODE_ENV === 'production' ? 'mongodb://localhost/parser' : 'mongodb://192.168.99.100/parser';
+const mongoURI = process.env.NODE_ENV === 'production'
+  ? 'mongodb://localhost/parser'
+  : 'mongodb://192.168.99.100/parser';
 
 const sendersMail = 'senderadvertmail24@gmail.com';
 const sendersMailPassword = '123senderadvertmail24';
