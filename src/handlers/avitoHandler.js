@@ -42,15 +42,18 @@ function avitoHandler(error, response, html) {
   }, []);
 
   const filteredAds = adverts.filter((item) => {
-    const condition = indexOf(item.title, 'контейнер')
-      && !indexOf(item.title, 'рефконтейнер')
-      && !indexOf(item.title, 'мусор');
-
+    const forbiddenWords = ['рефконтейнер', 'мусор', 'шиномонтажка'];
+    const condition = !indexOf(item.title, ...forbiddenWords) && indexOf(item.title, 'контейнер');
+    console.log('Condition: ', condition);
+    console.log('Diffirence in time: ', diffirenceInTime(item.datePostTime));
     if (diffirenceInTime(item.datePostTime) <= 5 && condition) {
-      return item;
+      return true;
     }
+
     return false;
   });
+
+  console.log('Filtered adverts: ', filteredAds);
 
   Advert.find({}).exec((err, docs) => {
     if (err) {
